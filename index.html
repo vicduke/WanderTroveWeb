@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wandertrove</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="photos/wandertrovelogo.png" alt="Wandertrove Logo" class="logo">
+        </div>
+        <div class="content">
+            <p class="description"></p>
+            <img src="photos/homepagetoyota.jpg" alt="Off-road Vehicle" class="main-image">
+        </div>
+    </div>
+        <div class="sidebar">
+            <ul>
+                <li><a href="#">My Trips</a></li>
+                <hr>
+                <li><a href="#">Explore</a></li>
+                <hr>
+                <li><a href="#">Deals</a></li>
+                <hr>
+                <li><a href="#">Profile</a></li>
+            </ul>
+        </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+              const text = "Your No. 1 trip planner!";
+              const descriptionElement = document.querySelector(".description");
+              let index = 0;
+        
+              function typeText() {
+                if (index < text.length) {
+                  descriptionElement.textContent += text.charAt(index);
+                  index++;
+                  setTimeout(typeText, 100); 
+                } else {
+                  descriptionElement.style.borderRight = 'none'; 
+                }
+              }
+        
+              typeText();
+            });
+          </script>
+</body>
+</html>
