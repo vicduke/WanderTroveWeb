@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Trip</title>
+    <link rel="stylesheet" href="cmstyles.css">
+</head> 
+    <body>
+        <div class="container">
+            <h1>Add New Trip</h1>
+            <form id="tripForm">
+                <label for="tripName">Trip Name</label>
+                <input type="text" id="tripName" name="tripName" required>
+    
+                <label for="startDate">Start Date</label>
+                <input type="date" id="startDate" name="startDate" required>
+    
+                <label for="endDate">End Date</label>
+                <input type="date" id="endDate" name="endDate" required>
+    
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location" required>
+    
+                <label for="notes">Notes</label>
+                <textarea id="notes" name="notes" rows="4"></textarea>
+    
+                <div id="stopPoints">
+                    <h3>Stop Points</h3>
+                    <div class="stop-point">
+                        <input type="text" name="stopPointName[]" placeholder="Stop Point Name" required>
+                        <input type="text" name="stopPointType[]" placeholder="Type (fuel, food, sleep)" required>
+                    </div>
+                </div>
+                <button type="button" class="add-stop-point-btn" onclick="addStopPoint()">Add Stop Point</button>
+    
+                <div id="map"></div>
+    
+                <button type="submit" class="submit-btn">Save Trip</button>
+            </form>
+        </div>
+ <script src="script.js"></script> 
+</body>
+</html>

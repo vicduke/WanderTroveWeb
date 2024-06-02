@@ -1,0 +1,106 @@
+/*Common styles*/
+body{
+    background-color: #d1b79e;
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 16px;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+h2{
+    font-size: 24px;
+    color: black;
+    font-weight: bold;
+    text-align: center;
+}
+/*Trips page*/
+.myTripsheader{
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.addtrip{
+    background-color:#007BFF;
+    border-radius: 5px;
+    font-size: 18px;
+    padding: 3px;
+    margin:0;
+}
+
+.addtrip:hover{
+    box-shadow: 3px 3px rgb(85, 81, 81);
+    cursor: pointer;
+    color:white;
+}
+
+/*New trip*/
+.container {
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-top: 10px;
+}
+
+input, textarea {
+    padding: 10px;
+    margin-top: 5px;
+}
+
+.stop-point {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.stop-point input {
+    width: 45%;
+}
+
+.add-stop-point-btn, .submit-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+/*Profile*/
+.profile-container {
+    padding: 20px;
+    text-align: center;
+}
+
+.profile-container h2 {
+    margin-top: 0;
+}
+
+.profile-picture img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 2px solid #a05b34;
+    margin-bottom: 20px;
+}
+
+.profile-details p {
+    margin-bottom: 10px;
+    font-size: 18px;
+    padding: 5px;
+}
