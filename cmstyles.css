@@ -65,13 +65,53 @@ input, textarea {
     justify-content: space-between;
     align-items: center;
     margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
 }
 
-.stop-point input {
-    width: 45%;
+.stop-point input[type="checkbox"] {
+    margin-right: 10px;
 }
 
-.add-stop-point-btn, .submit-btn {
+.stop-point input[type="text"] {
+    width: 40%;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+
+.stop-point input[type="text"]:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.stoppointsbtn {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.stoppointsbtn button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    color:white;
+}
+
+.add-stop-points-btn{
+    background-color: rgb(42, 184, 42);
+}
+
+.delete-stop-points-btn{
+    background-color: rgb(229, 18, 18);
+}
+
+.submit-btn {
     margin-top: 20px;
     padding: 10px 20px;
     cursor: pointer;
@@ -79,6 +119,10 @@ input, textarea {
     color: white;
     border: none;
     border-radius: 5px;
+}
+
+.submit-btn:hover {
+    background-color: #0056b3;
 }
 
 /*Profile*/

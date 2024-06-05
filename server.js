@@ -39,11 +39,6 @@ app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Define routes
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
-});
-
 // Define a User representation for clarity
 const User = {
     tableName: 'Users', 
@@ -57,6 +52,41 @@ const User = {
         connection.query('SELECT * FROM ' + this.tableName + ' WHERE username = ?', username, callback);
     }
 };
+
+// Define a Trips representation
+const Trips = {
+    tableName: 'Trips',
+    createTrips: function(newTrip, callback) {
+        connection.query('INSERT INTO ' + this.tableName + ' SET ?', newTrip, callback);
+    }
+};
+
+// Define a Locations representation
+const Locations = {
+    tableName: 'Locations',
+    checkLocationExists: function(location, callback) {
+        connection.query('SELECT * FROM ' + this.tableName + ' WHERE location = ?', [location.location], (err, results) => {
+            if (err) return callback(err);
+            callback(null, results.length > 0);
+        });
+    },
+    addLocation: function(newLocation, callback) {
+        connection.query('INSERT INTO ' + this.tableName + ' SET ?', newLocation, callback);
+    }
+};
+
+// Define a Stop_Points representation
+const Stop_Points = {
+    tableName: 'Stop_Points',
+    createStopPoint: function(newStopPoint, callback) {
+        connection.query('INSERT INTO ' + this.tableName + ' SET ?', newStopPoint, callback);
+    }
+};
+
+// Define routes
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
 
 // Registration route
 app.post('/register', [
@@ -146,7 +176,7 @@ const isAuthenticated = (req, res, next) => {
     }
 };
 
-// Route to get the user's full name
+// Route to get the user's full  and email
 app.get('/get-fullname',isAuthenticated , (req, res) => {
     if (req.session.user && req.session.user.full_name) {
         res.json({ fullName: req.session.user.full_name, useremail: req.session.user.email });
@@ -155,6 +185,70 @@ app.get('/get-fullname',isAuthenticated , (req, res) => {
     }
 });
 
+//route to save a trip
+app.post('/saveTrip', isAuthenticated,async (req,res) => {
+    const newTrip = {
+                tripName: req.body.tripName,
+                startDate: req.body.startDate,
+                endDate: req.body.endDate,
+                notes: req.body.notes
+    };
+
+    const newLocation = {
+        location:req.body.location
+    };
+
+    const newStopPoint = req.body.stopPoints;
+
+    try {
+        // Insert new trip
+        const tripResults = await new Promise((resolve, reject) => {
+            Trips.createTrips(newTrip, (error, results) => {
+                if (error) return reject(error);
+                console.log('Inserted a new trip with id ' + results.insertId);
+                resolve(results);
+            });
+        });
+
+        // Check if location exists and add it if it doesn't
+        const locationExists = await new Promise((resolve, reject) => {
+            Locations.checkLocationExists(newLocation, (err, exists) => {
+                if (err) return reject(err);
+                resolve(exists);
+            });
+        });
+
+        if (!locationExists) {
+            await new Promise((resolve, reject) => {
+                Locations.addLocation(newLocation, (err, results) => {
+                    if (err) return reject(err);
+                    console.log('Inserted a new location with id ' + results.insertId);
+                    resolve(results);
+                });
+            });
+        } else {
+            console.log('Location already exists');
+        }
+
+        // Insert new stop point
+        const stopPointResults = await new Promise((resolve, reject) => {
+            Stop_Points.createStopPoint(newStopPoint, (error, results) => {
+                if (error) return reject(error);
+                console.log('Inserted a new stopPoint with id ' + results.insertId);
+                resolve(results);
+            });
+        });
+
+        // If all operations succeed, send a unified response
+        res.status(201).json({ message: 'Trip saved successfully!' });
+
+    } catch (error) {
+        console.error('Error processing request: ' + error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

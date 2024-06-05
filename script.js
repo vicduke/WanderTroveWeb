@@ -105,8 +105,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
             stopPointsDiv.querySelectorAll('.stop-point').forEach(stopPoint => {
                 stopPoints.push({
-                    name: stopPoint.querySelector('input[name="stopPointName[]"]').value,
-                    type: stopPoint.querySelector('input[name="stopPointType[]"]').value
+                    stopName: stopPoint.querySelector('input[name="stopPointName[]"]').value,
+                    stopType: stopPoint.querySelector('input[name="stopPointType[]"]').value
                 });
             });
 
@@ -137,19 +137,37 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
+//adding and deleting a stop point
+    const addStopPointBtn = document.querySelector('.add-stop-points-btn');
+    const deleteStopPointBtn = document.querySelector('.delete-stop-points-btn');
 
-    if (stopPointsDiv) {
-        document.querySelector('.add-stop-point-btn').addEventListener('click', addStopPoint);
+    if (addStopPointBtn) {
+        addStopPointBtn.addEventListener('click', addStopPoint);
+    }
+
+    if (deleteStopPointBtn) {
+        deleteStopPointBtn.addEventListener('click', deleteStopPoint);
     }
 
     function addStopPoint() {
         const stopPointDiv = document.createElement('div');
         stopPointDiv.classList.add('stop-point');
         stopPointDiv.innerHTML = `
+            <input type="checkbox" class="stop-point-checkbox">
             <input type="text" name="stopPointName[]" placeholder="Stop Point Name" required>
             <input type="text" name="stopPointType[]" placeholder="Type (fuel, food, sleep)" required>
         `;
         stopPointsDiv.appendChild(stopPointDiv);
+    }
+
+    function deleteStopPoint() {
+        const checkboxes = document.querySelectorAll('.stop-point-checkbox');
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                const stopPointDiv = checkbox.parentElement;
+                stopPointsDiv.removeChild(stopPointDiv);
+            }
+        });
     }
 
     // Check if the current page is the profile page
@@ -166,7 +184,7 @@ function goToAddTripPage() {
 }
 
 function fetchFullName() {
-    // Make AJAX request to fetch the user's full name from the server
+    // Make AJAX request to fetch the user's full name and email from the server
     fetch('/get-fullname')
         .then(response => {
             if (!response.ok) {
