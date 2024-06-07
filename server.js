@@ -65,26 +65,48 @@ const Trips = {
 const Locations = {
     tableName: 'Locations',
     checkLocationExists: function(location, callback) {
-        connection.query('SELECT * FROM ' + this.tableName + ' WHERE location = ?', [location.location], (err, results) => {
-            if (err) return callback(err);
-            callback(null, results.length > 0);
+        connection.query('SELECT location_id FROM ' + this.tableName + ' WHERE location = ?', [location.location], (err, results) => {
+            if (err)return callback(err);
+            callback(null, results.length > 0 ? results[0].location_id : null);
         });
     },
-    addLocation: function(newLocation, callback) {
-        connection.query('INSERT INTO ' + this.tableName + ' SET ?', newLocation, callback);
+    addLocation: function(newlocation, callback) {
+        connection.query('INSERT INTO ' + this.tableName + ' SET ?', newlocation, callback);
     }
 };
 
 // Define a Stop_Points representation
 const Stop_Points = {
     tableName: 'Stop_Points',
-    createStopPoint: function(newStopPoint, callback) {
-        connection.query('INSERT INTO ' + this.tableName + ' SET ?', newStopPoint, callback);
+    createStopPoint: function(stopPoint, callback) {
+        connection.query('INSERT INTO ' + this.tableName + ' SET ?', stopPoint, callback);
     }
+};
+
+// Function to retrieve trips by user ID
+const getTripsByUserId = (userId, callback) => {
+    const query = 'SELECT * FROM Trips WHERE user_id = ?';
+    connection.query(query, [userId], callback);
+};
+
+// Function to retrieve a trip by ID
+const getTripById = (tripId, callback) => {
+    const query = `
+    SELECT t.*, s.stopName, s.stopType, l.location
+    FROM Trips t
+    LEFT JOIN Stop_Points s ON t.trip_id = s.trip_id
+    LEFT JOIN Locations l ON t.location_id = l.location_id
+    WHERE t.trip_id = ?
+    `;
+    connection.query(query, [tripId], callback);
 };
 
 // Define routes
 app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
+
+app.get('/login', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 
@@ -152,8 +174,14 @@ app.post('/login', (req, res) => {
                 if (err) throw err;
                 if (isMatch) {
                     // Store user in session
-                    req.session.user = user;
-                    res.send('Login successful');
+                    req.session.user = {
+                        id: user.user_id,
+                        username: user.username,
+                        email: user.email,
+                        full_name: user.full_name
+                    };
+                    console.log('User logged in, session:', req.session.user); // Debugging
+                    return res.send('Login successful');
                 } else {
                     res.status(401).send('Invalid username or password');
                 }
@@ -169,14 +197,15 @@ app.post('/logout', (req, res) => {
 });
 
 const isAuthenticated = (req, res, next) => {
-    if (req.session.user) {
+    console.log('Session data:', req.session); // Debugging
+    if (req.session && req.session.user && req.session.user.id) {
         next(); // Proceed to the next middleware or route handler
     } else {
-        res.redirect('/index.html'); // Redirect to the login page
+        res.redirect('/login'); //Redirect to login page
     }
 };
 
-// Route to get the user's full  and email
+// Route to get the user's full name  and email
 app.get('/get-fullname',isAuthenticated , (req, res) => {
     if (req.session.user && req.session.user.full_name) {
         res.json({ fullName: req.session.user.full_name, useremail: req.session.user.email });
@@ -186,58 +215,61 @@ app.get('/get-fullname',isAuthenticated , (req, res) => {
 });
 
 //route to save a trip
-app.post('/saveTrip', isAuthenticated,async (req,res) => {
-    const newTrip = {
-                tripName: req.body.tripName,
-                startDate: req.body.startDate,
-                endDate: req.body.endDate,
-                notes: req.body.notes
-    };
-
+app.post('/saveTrip', isAuthenticated, async (req,res) => {
+    
     const newLocation = {
         location:req.body.location
     };
 
-    const newStopPoint = req.body.stopPoints;
-
     try {
+        // Check if location exists and add it if it doesn't
+        let locationId = await new Promise((resolve, reject) => {
+            Locations.checkLocationExists(newLocation, (err, exists) => {
+                if (err) return reject(err);
+                if (exists) {
+                    console.log('Location already exists')
+                    resolve(exists);
+                } else {
+                    Locations.addLocation(newLocation, (err, results) => {
+                        if (err) return reject(err);
+                        console.log('Inserted a new location with id ' + results.insertId);
+                        resolve(results.insertId);
+                    });
+                }
+            });
+        });
+        
+        const newTrip = {
+            tripName: req.body.tripName,
+            startDate: req.body.startDate,
+            endDate: req.body.endDate,
+            notes: req.body.notes,
+            user_id: req.session.user.id,
+            location_id: locationId
+};
+
         // Insert new trip
         const tripResults = await new Promise((resolve, reject) => {
             Trips.createTrips(newTrip, (error, results) => {
                 if (error) return reject(error);
                 console.log('Inserted a new trip with id ' + results.insertId);
-                resolve(results);
+                resolve(results.insertId);
             });
         });
 
-        // Check if location exists and add it if it doesn't
-        const locationExists = await new Promise((resolve, reject) => {
-            Locations.checkLocationExists(newLocation, (err, exists) => {
-                if (err) return reject(err);
-                resolve(exists);
-            });
-        });
+        const newStopPoint = req.body.stopPoints;
 
-        if (!locationExists) {
+        // Insert new stop points
+        for (const stopPoint of newStopPoint) {
+            stopPoint.trip_id = tripResults;
             await new Promise((resolve, reject) => {
-                Locations.addLocation(newLocation, (err, results) => {
-                    if (err) return reject(err);
-                    console.log('Inserted a new location with id ' + results.insertId);
+                Stop_Points.createStopPoint(stopPoint, (error, results) => {
+                    if (error) return reject(error);
+                    console.log('Inserted a new stopPoint with id ' + results.insertId);
                     resolve(results);
                 });
             });
-        } else {
-            console.log('Location already exists');
         }
-
-        // Insert new stop point
-        const stopPointResults = await new Promise((resolve, reject) => {
-            Stop_Points.createStopPoint(newStopPoint, (error, results) => {
-                if (error) return reject(error);
-                console.log('Inserted a new stopPoint with id ' + results.insertId);
-                resolve(results);
-            });
-        });
 
         // If all operations succeed, send a unified response
         res.status(201).json({ message: 'Trip saved successfully!' });
@@ -246,6 +278,48 @@ app.post('/saveTrip', isAuthenticated,async (req,res) => {
         console.error('Error processing request: ' + error.message);
         res.status(500).json({ error: error.message });
     }
+});
+
+// Route to get all trips for the logged-in user
+app.get('/getUserTrips', isAuthenticated, (req, res) => {
+    const userId = req.session.user.id; 
+
+    getTripsByUserId(userId, (error, results) => {
+        if (error) {
+            console.error('Error fetching trips: ' + error.message);
+            return res.status(500).json({ error: error.message });
+        }
+        res.status(200).json(results);
+    });
+});
+
+// Route to get trip details
+app.get('/getTripDetails', isAuthenticated, (req, res) => {
+    const tripId = req.query.id;
+
+    getTripById(tripId, (error, results) => {
+        if (error) {
+            console.error('Error fetching trip details: ' + error.message);
+            return res.status(500).json({ error: error.message });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Trip not found' });
+        }
+
+        const trip = {
+            tripName: results[0].tripName,
+            startDate: results[0].startDate,
+            endDate: results[0].endDate,
+            location: results[0].location,
+            notes: results[0].notes,
+            stopPoints: results.map(row => ({
+                stopName: row.stopName,
+                stopType: row.stopType
+            }))
+        };
+
+        res.status(200).json(trip);
+    });
 });
 
 // Start the server

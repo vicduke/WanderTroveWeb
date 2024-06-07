@@ -176,6 +176,20 @@ document.addEventListener("DOMContentLoaded", function() {
         fetchFullName();
     }
 
+    // Check if the current page is the trips page page
+    if (window.location.pathname.endsWith('trips.html')) {
+        fetchUserTrips();
+    }
+
+    window.openTrip = function(tripId) {
+        window.location.href = `/detailtrip.html?id=${tripId}`;
+        }
+
+    if (window.location.pathname.endsWith('detailtrip.html')) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tripId = urlParams.get('id');
+        fetchTripDetails(tripId);
+    }
 });
 
 // Script for navigating to trip page
@@ -213,5 +227,84 @@ function displayFullName(fullName, useremail) {
         useremailelement.textContent = useremail;
     } else {
         console.error('Element with id "user-email" not found');
+    }
+}
+
+function fetchUserTrips() {
+    fetch('/getUserTrips')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(trips => {
+            displayTrips(trips);
+        })
+        .catch(error => {
+            console.error('Error fetching trips:', error);
+        });
+}
+
+function displayTrips(trips) {
+    const tripsList = document.getElementById('tripsList');
+    tripsList.innerHTML = ''; // Clear any existing content
+
+    if (trips.length === 0) {
+        tripsList.innerHTML = '<p>No trips found.</p>';
+        return;
+    }
+
+    trips.forEach(trip => {
+        const tripElement = document.createElement('div');
+        tripElement.classList.add('trip-item');
+        tripElement.innerHTML = `
+            <h3>${trip.tripName}</h3>
+            <p><strong>Start Date:</strong> ${trip.startDate}</p>
+            <p><strong>End Date:</strong> ${trip.endDate}</p>
+            <button onclick="openTrip(${trip.trip_id})">View Trip</button>
+        `;
+        tripsList.appendChild(tripElement);
+    });
+}
+
+function fetchTripDetails(tripId) {
+    fetch(`/getTripDetails?id=${tripId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(trip => {
+            displayTripDetails(trip);
+        })
+        .catch(error => {
+            console.error('Error fetching trip details:', error);
+        });
+}
+
+function displayTripDetails(trip) {
+    document.getElementById('tripName').textContent = trip.tripName;
+    document.getElementById('startDate').textContent = trip.startDate;
+    document.getElementById('endDate').textContent = trip.endDate;
+    document.getElementById('location').textContent = trip.location;
+    document.getElementById('notes').textContent = trip.notes;
+
+    const stopPointsList = document.getElementById('stopPointsList');
+    stopPointsList.innerHTML = ''; // Clear any existing content
+
+    if (trip.stopPoints.length === 0) {
+        stopPointsList.innerHTML = '<p>No stop points found.</p>';
+        return;
+    }else{trip.stopPoints.forEach(stopPoint => {
+        const stopPointElement = document.createElement('div');
+        stopPointElement.classList.add('stop-point-item');
+        stopPointElement.innerHTML = `
+            <p><strong>Stop Name:</strong> ${stopPoint.stopName}</p>
+            <p><strong>Stop Type:</strong> ${stopPoint.stopType}</p>
+        `;
+        stopPointsList.appendChild(stopPointElement);
+    });
     }
 }
