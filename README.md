@@ -1,4 +1,5 @@
-WanderTrove
+<h1>WanderTrove</h1>
+<br>
 WanderTrove is a travel management application that allows users to create, view, and manage their trips. Users can register, log in, create new trips, and add details about each trip, including multiple stop points. The application leverages MySQL for data storage and uses date-fns for date formatting.
 Table of Contents
 Installation
