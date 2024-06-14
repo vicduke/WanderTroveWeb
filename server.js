@@ -4,21 +4,23 @@ const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 const mysql = require('mysql2');
 const { check, validationResult } = require('express-validator');
+const dotenv = require("dotenv");
 const app = express();
+dotenv.config();
 
 // Configure session middleware
 app.use(session({
-    secret: 'qwertyasdfg1234',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true
 }));
 
 // Create MySQL connection
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '@Nesh2005',
-    database: 'wandertrove'
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
 });
 
 // Connect to MySQL

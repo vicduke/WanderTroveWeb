@@ -1,33 +1,54 @@
-WanderTrove
-WanderTrove is a travel management application that allows users to create, view, and manage their trips. Users can register, log in, create new trips, and add details about each trip, including multiple stop points. The application leverages MySQL for data storage and uses date-fns for date formatting.
-Table of Contents
-Installation
-Usage
-API Endpoints
-Technologies Used
-License
-Installation
-Prerequisites
-Node.js
-MySQL
-Steps
-Clone the repository:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WanderTrove README</title>
+</head>
+<body>
 
-sh
-Copy code
-git clone https://github.com/your-username/wandertrove.git
+<h1>WanderTrove</h1>
+<p>WanderTrove is a travel management application that allows users to create, view, and manage their trips. Users can register, log in, create new trips, and add details about each trip, including multiple stop points. The application leverages MySQL for data storage.</p>
+
+<h2>Table of Contents</h2>
+<ul>
+    <li><a href="#installation">Installation</a></li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#technologies-used">Technologies Used</a></li>
+    <li><a href="#license">License</a></li>
+</ul>
+
+<h2 id="installation">Installation</h2>
+
+<h3>Prerequisites</h3>
+<ul>
+    <li>Node.js</li>
+    <li>MySQL</li>
+</ul>
+
+<h3>Steps</h3>
+<p>Clone the repository:</p>
+
+<pre><code>sh
+git clone https://github.com/vicduke/wandertrove.git
 cd wandertrove
-Install the dependencies:
+</code></pre>
 
-sh
-Copy code
-npm install
-Set up the MySQL database:
+<p>Install the dependencies:</p>
 
-Create a MySQL database named wandertrove.
-Run the following SQL commands to set up the necessary tables:
-sql
-Copy code
+<pre><code>sh
+npm install express express-session bcryptjs body-parser mysql2 express-validator dotenv
+</code></pre>
+
+<p>Set up the MySQL database:</p>
+<ol>
+    <li>Create a MySQL database named wandertrove.</li>
+    <li>Run the following SQL commands to set up the necessary tables:</li>
+</ol>
+
+<pre><code>sql
+CREATE DATABASE wandertrove;
+USE wandertrove
 CREATE TABLE Users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
@@ -58,99 +79,55 @@ CREATE TABLE Stop_Points (
     trip_id INT,
     FOREIGN KEY (trip_id) REFERENCES Trips(id)
 );
-Create a .env file in the root directory and add your MySQL credentials:
+</code></pre>
 
-env
-Copy code
+<p>Create a .env file in the root directory and add your MySQL credentials:</p>
+
+<pre><code>env
 DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=yourpassword
 DB_NAME=wandertrove
 SESSION_SECRET=your-session-secret
-Start the server:
+</code></pre>
 
-sh
-Copy code
-npm start
-Open your browser and navigate to http://localhost:3000.
+<p>Start the server:</p>
 
-Usage
-Register: Create a new account by providing an email, username, and password.
-Login: Log in with your registered username and password.
-Create Trip: Create a new trip with details like trip name, start date, end date, and notes.
-Add Stop Points: Add multiple stop points to your trip.
-View Trips: View a list of your trips and click on each trip to view detailed information.
-API Endpoints
-User Endpoints
-Register a new user:
+<pre><code>sh
+node server.js
+</code></pre>
 
-URL: /register
-Method: POST
-Body:
-json
-Copy code
-{
-  "email": "user@example.com",
-  "username": "username",
-  "password": "password",
-  "full_name": "Full Name"
-}
-Login:
+<p>Open your browser and navigate to <a href="http://localhost:3000">http://localhost:3000</a>.</p>
 
-URL: /login
-Method: POST
-Body:
-json
-Copy code
-{
-  "username": "username",
-  "password": "password"
-}
-Logout:
+<h2 id="usage">Usage</h2>
+<ul>
+    <li>Register: Create a new account by providing an email, username, and password.</li>
+    <li>Login: Log in with your registered username and password.</li>
+    <li>Create Trip: Create a new trip with details like trip name, start date, end date, and notes.</li>
+    <li>Add Stop Points: Add multiple stop points to your trip.</li>
+    <li>View Trips: View a list of your trips and click on each trip to view detailed information.</li>
+    <li>Explore: Explore published trips</li>
+</ul>
 
-URL: /logout
-Method: POST
-Trip Endpoints
-Save a trip:
+<h2 id="technologies-used">Technologies Used</h2>
+<h3>Backend:</h3>
+<ul>
+    <li>Node.js</li>
+    <li>Express.js</li>
+    <li>MySQL</li>
+    <li>bcrypt.js for password hashing</li>
+    <li>express-session for session management</li>
+</ul>
 
-URL: /saveTrip
-Method: POST
-Body:
-json
-Copy code
-{
-  "tripName": "Trip to Paris",
-  "startDate": "2024-06-05T21:00:00.000Z",
-  "endDate": "2024-06-10T21:00:00.000Z",
-  "location": "Paris",
-  "notes": "A trip to Paris",
-  "stopPoints": [
-    {
-      "stopName": "Eiffel Tower",
-      "stopType": "Sightseeing"
-    }
-  ]
-}
-Get user trips:
+<h3>Frontend:</h3>
+<ul>
+    <li>HTML </li>
+    <li>CSS</li>
+    <li>JavaScript</li>
+</ul>
 
-URL: /getUserTrips
-Method: GET
-Get trip details:
+<h2 id="license">License</h2>
+<p>This project is licensed under the MIT License.</p>
 
-URL: /getTripDetails
-Method: GET
-Query Parameter: id (trip ID)
-Technologies Used
-Backend:
-
-Node.js
-Express.js
-MySQL
-bcrypt.js for password hashing
-express-session for session management
-Frontend:
-
-HTML, CSS, JavaScript
-date-fns for date formatting
-License
-This project is licensed under the MIT License.
+</body>
+</html>
