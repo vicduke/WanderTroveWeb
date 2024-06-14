@@ -48,7 +48,7 @@ npm install express express-session bcryptjs body-parser mysql2 express-validato
 
 <pre><code>
 CREATE DATABASE wandertrove;
-USE wandertrove
+USE wandertrove;
 CREATE TABLE Users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
