@@ -29,14 +29,14 @@
 <h3>Steps</h3>
 <p>Clone the repository:</p>
 
-<pre><code>sh
+<pre><code>
 git clone https://github.com/vicduke/wandertrove.git
 cd wandertrove
 </code></pre>
 
 <p>Install the dependencies:</p>
 
-<pre><code>sh
+<pre><code>
 npm install express express-session bcryptjs body-parser mysql2 express-validator dotenv
 </code></pre>
 
@@ -46,7 +46,7 @@ npm install express express-session bcryptjs body-parser mysql2 express-validato
     <li>Run the following SQL commands to set up the necessary tables:</li>
 </ol>
 
-<pre><code>sql
+<pre><code>
 CREATE DATABASE wandertrove;
 USE wandertrove
 CREATE TABLE Users (
@@ -83,7 +83,7 @@ CREATE TABLE Stop_Points (
 
 <p>Create a .env file in the root directory and add your MySQL credentials:</p>
 
-<pre><code>env
+<pre><code>
 DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=yourpassword
@@ -93,7 +93,7 @@ SESSION_SECRET=your-session-secret
 
 <p>Start the server:</p>
 
-<pre><code>sh
+<pre><code>
 node server.js
 </code></pre>
 
