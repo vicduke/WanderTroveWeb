@@ -147,7 +147,7 @@ app.post('/register', [
         email: req.body.email,
         username: req.body.username,
         password: hashedPassword,
-        fullname: req.body.full_name
+        full_name: req.body.full_name
     };
 
     // Insert user into MySQL
